@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-DROP TABLE IF EXISTS tenmo_user, account;
+DROP TABLE IF EXISTS tenmo_user, account, transaction CASCADE;
 
 DROP SEQUENCE IF EXISTS seq_user_id, seq_account_id;
 
@@ -37,7 +37,7 @@ CREATE TABLE transaction (
 	transaction_id serial NOT NULL,
 	from_acct int NOT NULL,
 	to_acct int NOT NULL,
-	amount int NOT NULL, 
+	amount money NOT NULL, 
 	date_time timestamp NOT NULL,
 	CONSTRAINT PK_transaction PRIMARY KEY (transaction_id),
 	CONSTRAINT FK_transaction_from_account FOREIGN KEY (from_acct) REFERENCES account (account_id),

@@ -13,6 +13,5 @@ public interface AccountDao {
 
     BigDecimal getBalance(long accountId);
 
-    boolean sendFunds(long toAccountId, BigDecimal sendAmount);
 
 }

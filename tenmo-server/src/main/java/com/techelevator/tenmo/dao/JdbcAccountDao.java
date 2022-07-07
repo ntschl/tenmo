@@ -1,14 +1,13 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.User;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,17 +41,6 @@ public class JdbcAccountDao implements AccountDao{
             account = mapRowToAccount(results);
         }
         return account.getBalance();
-    }
-
-    @Override
-    public boolean sendFunds(long toAccountId, BigDecimal sendAmount){
-        String sql = "UPDATE account SET balance = ? WHERE account_id = ?;";
-        try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, (sendAmount.add(getBalance(toAccountId))), toAccountId);
-        } catch (DataAccessException e) {
-            return false;
-        }
-        return true;
     }
 
     private Account mapRowToAccount(SqlRowSet rs) {

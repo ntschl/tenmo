@@ -2,6 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.JdbcAccountDao;
+import com.techelevator.tenmo.dao.TransactionDao;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -24,11 +25,6 @@ public class AccountController {
         return dao.getBalance(id);
     }
 
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @RequestMapping(path = "/send/{id}/{amount}", method = RequestMethod.PUT)
-    public boolean sendFunds(@PathVariable int id, @PathVariable BigDecimal amount) {
-        return dao.sendFunds(id, amount);
-    }
 
 
 }
