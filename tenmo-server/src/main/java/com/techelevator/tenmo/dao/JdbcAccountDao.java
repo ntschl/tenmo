@@ -2,14 +2,17 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.User;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class JdbcAccountDao implements AccountDao{
 
     public static List<Account> accounts = new ArrayList<>();
@@ -19,9 +22,6 @@ public class JdbcAccountDao implements AccountDao{
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public JdbcAccountDao(){
-        this.jdbcTemplate = new JdbcTemplate();
-    }
 
     @Override
     public List<Account> findAll() {
@@ -36,13 +36,23 @@ public class JdbcAccountDao implements AccountDao{
     @Override
     public BigDecimal getBalance(long accountId) {
         Account account = null;
-        String sql = "SELECT balance FROM account WHERE account_id = ?";
+        String sql = "SELECT balance, user_id, account_id FROM account WHERE account_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
-
         if(results.next()){
             account = mapRowToAccount(results);
         }
         return account.getBalance();
+    }
+
+    @Override
+    public boolean sendFunds(long toAccountId, BigDecimal sendAmount){
+        String sql = "UPDATE account SET balance = ? WHERE account_id = ?;";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, (sendAmount.add(getBalance(toAccountId))), toAccountId);
+        } catch (DataAccessException e) {
+            return false;
+        }
+        return true;
     }
 
     private Account mapRowToAccount(SqlRowSet rs) {
