@@ -7,6 +7,7 @@ import java.util.Set;
 public class User {
 
    private Long id;
+   private Long accountId;
    private String username;
    private String password;
    private boolean activated;
@@ -55,6 +56,14 @@ public class User {
 
    public Set<Authority> getAuthorities() {
       return authorities;
+   }
+
+   public Long getAccountId() {
+      return accountId;
+   }
+
+   public void setAccountId(Long accountId) {
+      this.accountId = accountId;
    }
 
    public void setAuthorities(Set<Authority> authorities) {
