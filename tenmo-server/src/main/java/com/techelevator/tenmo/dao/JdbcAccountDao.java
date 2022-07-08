@@ -43,6 +43,20 @@ public class JdbcAccountDao implements AccountDao{
         return account.getBalance();
     }
 
+    public List<Account> getAccountsByUsername(String username){
+        List<Account> accounts = new ArrayList<>();
+        String sql = "SELECT account_id, tu.user_id, balance" +
+                    " FROM account AS a JOIN tenmo_user AS tu ON tu.user_id = a.user_id" +
+                    " WHERE username = ?;";
+
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
+        while(results.next()){
+            Account account = mapRowToAccount(results);
+            accounts.add(account);
+        }
+        return accounts;
+    }
+
     private Account mapRowToAccount(SqlRowSet rs) {
         Account account = new Account();
         account.setUserId(rs.getLong("user_id"));

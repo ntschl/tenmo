@@ -26,18 +26,26 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public boolean sendFunds(long fromAccountId, long toAccountId, BigDecimal sendAmount){
-        String sql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
-        String sql2 = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
+    public boolean sendFunds(String toUser, String fromUser, BigDecimal sendAmount){
+        String sql = "UPDATE account SET balance = balance - ? " +
+                    " WHERE account_id = " +
+                    " (SELECT account_id FROM account " +
+                    " JOIN tenmo_user AS tu ON account.user_id = tu.user_id " +
+                    " WHERE username = ?);";
+        String sql2 = "UPDATE account SET balance = balance + ? " +
+                    " WHERE account_id = " +
+                    " (SELECT account_id FROM account " +
+                    " JOIN tenmo_user AS tu ON account.user_id = tu.user_id " +
+                    " WHERE username = ?);";
         String sql3 = "INSERT INTO transaction (from_acct, to_acct, amount, date_time, status) VALUES (?, ?, ?, ?, ?)";
-        if (sendAmount.compareTo(dao.getBalance(fromAccountId)) > 0){
+        if (sendAmount.compareTo(dao.getBalance(dao.getAccountsByUsername(fromUser).get(0).getAccountId())) > 0){
             return false;
         } else if (sendAmount.compareTo(BigDecimal.ZERO) <= 0){
             return false;
         }
-        jdbcTemplate.update(sql, sendAmount, fromAccountId);
-        jdbcTemplate.update(sql2, sendAmount, toAccountId);
-        jdbcTemplate.update(sql3, fromAccountId, toAccountId, sendAmount, LocalDateTime.now(), "APPROVED");
+        jdbcTemplate.update(sql, sendAmount, fromUser);
+        jdbcTemplate.update(sql2, sendAmount, toUser);
+        jdbcTemplate.update(sql3, dao.getAccountsByUsername(fromUser).get(0).getAccountId(), dao.getAccountsByUsername(toUser).get(0).getAccountId(), sendAmount, LocalDateTime.now(), "APPROVED");
 
         return true;
     }
