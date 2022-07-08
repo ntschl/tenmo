@@ -2,6 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.TransactionDao;
 import com.techelevator.tenmo.model.Transaction;
+import com.techelevator.tenmo.model.TransactionDTO;
 import com.techelevator.tenmo.security.InvalidTransactionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,12 +24,12 @@ public class TransactionController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(path = "/send/{toUsername}", method = RequestMethod.POST)
-    public boolean sendFunds(@Valid @RequestBody Transaction transaction, @PathVariable String toUsername, Principal principal) throws InvalidTransactionException {
-        if(transaction.getSenderId() == transaction.getReceiverId()){
+    @RequestMapping(path = "/send", method = RequestMethod.POST)
+    public boolean sendFunds(@Valid @RequestBody TransactionDTO transactionDTO, Principal principal) throws InvalidTransactionException {
+        if(transactionDTO.getToUsername().equalsIgnoreCase(principal.getName())){
             throw new InvalidTransactionException();
         }
-        return dao.sendFunds(toUsername, principal.getName(), transaction.getAmount());
+        return dao.sendFunds(transactionDTO.getToUsername(), principal.getName(), transactionDTO.getAmount());
     }
 
     @RequestMapping(path = "/transactions/user/{userId}", method = RequestMethod.GET)

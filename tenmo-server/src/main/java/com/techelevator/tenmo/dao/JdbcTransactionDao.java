@@ -27,25 +27,21 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public boolean sendFunds(String toUser, String fromUser, BigDecimal sendAmount){
+        long fromId = dao.getAccountsByUsername(fromUser).get(0).getAccountId();
+        long toId = dao.getAccountsByUsername(toUser).get(0).getAccountId();
         String sql = "UPDATE account SET balance = balance - ? " +
-                    " WHERE account_id = " +
-                    " (SELECT account_id FROM account " +
-                    " JOIN tenmo_user AS tu ON account.user_id = tu.user_id " +
-                    " WHERE username = ?);";
+                    " WHERE account_id = ?";
         String sql2 = "UPDATE account SET balance = balance + ? " +
-                    " WHERE account_id = " +
-                    " (SELECT account_id FROM account " +
-                    " JOIN tenmo_user AS tu ON account.user_id = tu.user_id " +
-                    " WHERE username = ?);";
+                    " WHERE account_id = ?";
         String sql3 = "INSERT INTO transaction (from_acct, to_acct, amount, date_time, status) VALUES (?, ?, ?, ?, ?)";
-        if (sendAmount.compareTo(dao.getBalance(dao.getAccountsByUsername(fromUser).get(0).getAccountId())) > 0){
+        if (sendAmount.compareTo(dao.getBalance(fromId)) > 0){
             return false;
         } else if (sendAmount.compareTo(BigDecimal.ZERO) <= 0){
             return false;
         }
-        jdbcTemplate.update(sql, sendAmount, fromUser);
-        jdbcTemplate.update(sql2, sendAmount, toUser);
-        jdbcTemplate.update(sql3, dao.getAccountsByUsername(fromUser).get(0).getAccountId(), dao.getAccountsByUsername(toUser).get(0).getAccountId(), sendAmount, LocalDateTime.now(), "APPROVED");
+        jdbcTemplate.update(sql, sendAmount, fromId);
+        jdbcTemplate.update(sql2, sendAmount, toId);
+        jdbcTemplate.update(sql3, fromId, toId, sendAmount, LocalDateTime.now(), "APPROVED");
 
         return true;
     }
