@@ -39,6 +39,7 @@ CREATE TABLE transaction (
 	to_acct int NOT NULL,
 	amount money NOT NULL, 
 	date_time timestamp NOT NULL,
+	status varchar(50) NOT NULL,
 	CONSTRAINT PK_transaction PRIMARY KEY (transaction_id),
 	CONSTRAINT FK_transaction_from_account FOREIGN KEY (from_acct) REFERENCES account (account_id),
 	CONSTRAINT FK_transaction_to_account FOREIGN KEY (to_acct) REFERENCES account (account_id)

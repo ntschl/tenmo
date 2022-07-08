@@ -9,6 +9,15 @@ public class Transaction {
     private int senderId;
     private int receiverId;
     private BigDecimal amount;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Transaction(int transactionId, int senderId, int receiverId, BigDecimal amount) {
         this.transactionId = transactionId;

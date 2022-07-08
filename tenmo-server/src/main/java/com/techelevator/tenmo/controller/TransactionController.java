@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
@@ -27,6 +28,11 @@ public class TransactionController {
             return false;
         }
         return dao.sendFunds(transaction.getSenderId(), transaction.getReceiverId(), transaction.getAmount());
+    }
+
+    @RequestMapping(path = "/transactions/{userId}", method = RequestMethod.GET)
+    public List<Transaction> findTransactionByUserId(@PathVariable Long userId){
+        return dao.findTransactionByUserId(userId);
     }
 
 }
