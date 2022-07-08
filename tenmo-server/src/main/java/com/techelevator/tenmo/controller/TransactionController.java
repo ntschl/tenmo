@@ -4,6 +4,7 @@ import com.techelevator.tenmo.dao.TransactionDao;
 import com.techelevator.tenmo.model.Transaction;
 import com.techelevator.tenmo.model.TransactionDTO;
 import com.techelevator.tenmo.security.InvalidTransactionException;
+import com.techelevator.tenmo.security.InvalidTransactionIDException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +33,17 @@ public class TransactionController {
         return dao.sendFunds(transactionDTO.getToUsername(), principal.getName(), transactionDTO.getAmount());
     }
 
-    @RequestMapping(path = "/transactions/user/{userId}", method = RequestMethod.GET)
-    public List<Transaction> findTransactionByUserId(@PathVariable Long userId){
-        return dao.findTransactionByUserId(userId);
+    @RequestMapping(path = "/transactions", method = RequestMethod.GET)
+    public List<Transaction> findTransactionByUserId(Principal principal){
+        return dao.findTransactionsByUsername(principal.getName());
     }
 
     @RequestMapping(path = "/transactions/{transactionId}", method = RequestMethod.GET)
-    public Transaction findByTransactionId(@PathVariable int transactionId){
-        return dao.findByTransactionId(transactionId);
+    public Transaction findByTransactionId(@PathVariable int transactionId, Principal principal){
+        if (dao.findByTransactionId(transactionId, principal.getName()).getTransactionId() != transactionId) {
+            throw new InvalidTransactionIDException();
+        }
+        return dao.findByTransactionId(transactionId, principal.getName());
     }
 
 }

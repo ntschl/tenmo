@@ -46,6 +46,7 @@ public class JdbcTransactionDao implements TransactionDao {
         return true;
     }
 
+    //DEPRECATED
     public List<Transaction> findTransactionByUserId(Long userId){
         String sql = "SELECT transaction_id, from_acct, to_acct, amount, date_time, status" +
                 " FROM transaction AS t JOIN account as a ON a.account_id = t.from_acct OR a.account_id = t.to_acct" +
@@ -60,10 +61,28 @@ public class JdbcTransactionDao implements TransactionDao {
         return transactions;
     }
 
-    public Transaction findByTransactionId(int transactionId){
-        String sql = "SELECT transaction_id, from_acct, to_acct, amount, date_time, status FROM transaction WHERE transaction_id = ?;";
+    public List<Transaction> findTransactionsByUsername(String username) {
+        String sql = "select transaction_id, from_acct, to_acct, amount, date_time, status from transaction as t " +
+                "join account as a on a.account_id = t.from_acct OR a.account_id = t.to_acct " +
+                "join tenmo_user as tu on a.user_id = tu.user_id " +
+                "where username = ?;";
+        List<Transaction> transactions = new ArrayList<>();
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
+        while(results.next()) {
+            Transaction transaction = mapRowToTransaction(results);
+            transactions.add(transaction);
+        }
+        return transactions;
+    }
+
+    public Transaction findByTransactionId(int transactionId, String username){
+        String sql = "select transaction_id, from_acct, to_acct, amount, date_time, status from transaction as t " +
+                "join account as a on a.account_id = t.from_acct OR a.account_id = t.to_acct " +
+                "join tenmo_user as tu on a.user_id = tu.user_id " +
+                "where username = ? " +
+                "AND transaction_id = ?;";
         Transaction transaction =  new Transaction();
-        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transactionId);
+        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, username, transactionId);
         if (result.next()){
             transaction = mapRowToTransaction(result);
         }
