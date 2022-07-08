@@ -11,4 +11,6 @@ public interface TransactionDao {
 
     public List<Transaction> findTransactionByUserId(Long userId);
 
+    public Transaction findByTransactionId(int transactionId);
+
 }

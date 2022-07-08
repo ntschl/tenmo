@@ -30,9 +30,14 @@ public class TransactionController {
         return dao.sendFunds(transaction.getSenderId(), transaction.getReceiverId(), transaction.getAmount());
     }
 
-    @RequestMapping(path = "/transactions/{userId}", method = RequestMethod.GET)
+    @RequestMapping(path = "/transactions/user/{userId}", method = RequestMethod.GET)
     public List<Transaction> findTransactionByUserId(@PathVariable Long userId){
         return dao.findTransactionByUserId(userId);
+    }
+
+    @RequestMapping(path = "/transactions/{transactionId}", method = RequestMethod.GET)
+    public Transaction findByTransactionId(@PathVariable int transactionId){
+        return dao.findByTransactionId(transactionId);
     }
 
 }

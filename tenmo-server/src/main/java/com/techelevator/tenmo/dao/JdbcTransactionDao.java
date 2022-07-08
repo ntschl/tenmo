@@ -44,7 +44,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
     public List<Transaction> findTransactionByUserId(Long userId){
         String sql = "SELECT transaction_id, from_acct, to_acct, amount, date_time, status" +
-                " FROM transaction AS t JOIN account as a ON a.account_id = t.from_acct" +
+                " FROM transaction AS t JOIN account as a ON a.account_id = t.from_acct OR a.account_id = t.to_acct" +
                 " JOIN tenmo_user AS tu ON a.user_id = tu.user_id " +
                 " WHERE tu.user_id = ?;";
         List<Transaction> transactions = new ArrayList<>();
@@ -54,6 +54,16 @@ public class JdbcTransactionDao implements TransactionDao {
             transactions.add(transaction);
         }
         return transactions;
+    }
+
+    public Transaction findByTransactionId(int transactionId){
+        String sql = "SELECT transaction_id, from_acct, to_acct, amount, date_time, status FROM transaction WHERE transaction_id = ?;";
+        Transaction transaction =  new Transaction();
+        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transactionId);
+        if (result.next()){
+            transaction = mapRowToTransaction(result);
+        }
+        return transaction;
     }
 
     private Transaction mapRowToTransaction(SqlRowSet rs) {
