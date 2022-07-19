@@ -10,8 +10,6 @@ public interface TransactionDao {
 
     public boolean sendFunds(String toUser, String fromUser, BigDecimal sendAmount);
 
-    public List<Transaction> findTransactionByUserId(Long userId);
-
     public Transaction findByTransactionId(int transactionId, String username);
 
     public List<Transaction> findTransactionsByUsername(String username);

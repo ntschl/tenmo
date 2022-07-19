@@ -26,17 +26,6 @@ public class JdbcUserDao implements UserDao {
     private final  BigDecimal STARTING_BALANCE = new BigDecimal(1000);
 
     @Override
-    public int findIdByUsername(String username) {
-        String sql = "SELECT user_id FROM tenmo_user WHERE username ILIKE ?;";
-        Integer id = jdbcTemplate.queryForObject(sql, Integer.class, username);
-        if (id != null) {
-            return id;
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
     public List<String> findUsernames() {
         List<String> usernames = new ArrayList<>();
         String sql = "SELECT tu.user_id, a.account_id, username, password_hash FROM tenmo_user AS tu JOIN account AS a ON a.user_id = tu.user_id;";
@@ -45,18 +34,6 @@ public class JdbcUserDao implements UserDao {
             usernames.add(mapRowToUser(results).getUsername());
         }
         return usernames;
-    }
-
-    @Override
-    public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT tu.user_id, a.account_id, username, password_hash FROM tenmo_user AS tu JOIN account AS a ON a.user_id = tu.user_id;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        while(results.next()) {
-            User user = mapRowToUser(results);
-            users.add(user);
-        }
-        return users;
     }
 
     @Override

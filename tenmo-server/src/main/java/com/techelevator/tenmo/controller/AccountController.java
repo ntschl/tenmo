@@ -23,7 +23,6 @@ public class AccountController {
         dao = accountDao;
     }
 
-
     @RequestMapping(path = "/accounts", method = RequestMethod.GET)
     public List<Account> getAccountsByUsername(Principal principal){
        return dao.getAccountsByUsername(principal.getName());
